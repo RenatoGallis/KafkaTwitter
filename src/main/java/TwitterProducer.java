@@ -35,7 +35,7 @@ public class TwitterProducer {
 		String token="792793562064748544-DlNskS8nobKVRir5k7HIdgfJKc7yeUt";
 		String secret="J0fx96ge9hyLZQI3xaGmkKu3K3If5GxbxkVrFSlfNOZQd";
 		
-		List<String> terms = Lists.newArrayList("Canada","Toronto","Montreal","Quebec");
+		List<String> terms = Lists.newArrayList("Coronavirus");
 		
 	public static void main(String[] args) {
 	

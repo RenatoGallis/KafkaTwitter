@@ -1,12 +1,10 @@
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
@@ -140,24 +138,27 @@ public class TwitterConsumer {
 		public void run() {
 			// poll data temos que lançar uma exceção
 			try {
-				List<String> lines = null;
-		    	FileWriter file = new FileWriter("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
-		    	BufferedWriter buffWriter = new BufferedWriter(file);
+				File file = new File("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
+				file.getParentFile().mkdir();
+				file.createNewFile();
+				//passsa o caminho do arquivo que deve ser escrito
+		    	FileWriter writer = new FileWriter(file);
+		    	BufferedWriter buffWriter = new BufferedWriter(writer);
 				while (true) {
 					// Criando um consumer records para pegar a mensagem que esta sendo pesquisada
-					// de 100 mils em 100 mils
+					// de mils em  mils
 					ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
 
 					for (ConsumerRecord<String, String> record : records) {
 						// Gerar arquivo e mandar para o HDFS nesse ponto *** Renato Gallis****
 //						logger.info("Key:" + record.key() + "\n" + "Value:" + record.value() + "\n" + "Partition:"
 //								+ record.partition() + "\n" + "Offset:" + record.offset() + "TimeStamp:" + record.timestamp());
-//						lines = Arrays.asList(record.key(),record.value());
+//						
+						//Escreve dados no arquivo pré existente fazendo o append dos mesmos	
 						 buffWriter.write(record.value() + System.lineSeparator());
 						 buffWriter.flush();
 					}
-					
-//					Files.write(file,lines,StandardOpenOption.APPEND);
+//					buffWriter.close();
 				}
 			
 			} catch (WakeupException exception) {
