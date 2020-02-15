@@ -1,5 +1,6 @@
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -140,9 +141,8 @@ public class TwitterConsumer {
 			// poll data temos que lançar uma exceção
 			try {
 				List<String> lines = null;
-			    BufferedWriter buffWriter = null;
-		    	Path file = Paths.get("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
-				
+		    	FileWriter file = new FileWriter("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
+		    	BufferedWriter buffWriter = new BufferedWriter(file);
 				while (true) {
 					// Criando um consumer records para pegar a mensagem que esta sendo pesquisada
 					// de 100 mils em 100 mils
@@ -154,10 +154,10 @@ public class TwitterConsumer {
 //								+ record.partition() + "\n" + "Offset:" + record.offset() + "TimeStamp:" + record.timestamp());
 //						lines = Arrays.asList(record.key(),record.value());
 						 buffWriter.write(record.value() + System.lineSeparator());
-				            buffWriter.flush();
+						 buffWriter.flush();
 					}
-//					Files.write(file,lines,StandardOpenOption.APPEND);
 					
+//					Files.write(file,lines,StandardOpenOption.APPEND);
 				}
 			
 			} catch (WakeupException exception) {
