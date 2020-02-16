@@ -34,12 +34,12 @@ public class TwitterProducer {
 		Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 	
 		private static Properties config = new Properties();
-		private static String arquivo = "C:\\Users\\Renato Gallis\\twitterconfig.ini";
+		private static String arquivo = "caminho do arquivo config.ini";
 		
-//		String consumerKey="dqXM1Ch9CAUwsi6J5ltJ4QPK4";
-//		String consumerSecret="4eHvb7iTPInDmtQxfGBMLfiP7tjqjWNFoxbQOIuErUj1E3zQro";
-//		String token="792793562064748544-DlNskS8nobKVRir5k7HIdgfJKc7yeUt";
-//		String secret="J0fx96ge9hyLZQI3xaGmkKu3K3If5GxbxkVrFSlfNOZQd";
+//		String consumerKey;
+//		String consumerSecret;
+//		String token;
+//		String secret;
 //		
 		
 		List<String> terms = Lists.newArrayList("Coronavirus");
