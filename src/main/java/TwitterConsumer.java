@@ -8,6 +8,11 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.httpclient.URI;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -21,7 +26,6 @@ public class TwitterConsumer {
 
 	public static void main(String[] args) {
 		new TwitterConsumer().run();// Acesso o mmetodo da classe pelo construtor que instanciei
-
 	}
 
 	// construtor da classe ConsumerDemoThread para inicializa-la
@@ -62,7 +66,7 @@ public class TwitterConsumer {
 				logger.error("Aplicação interrompida");
 			}
 			logger.info("Aplicação terminada");
-
+			
 		}));
 
 		try {
@@ -138,6 +142,24 @@ public class TwitterConsumer {
 		public void run() {
 			// poll data temos que lançar uma exceção
 			try {
+				
+				// setando variaveis de configuração do hadoop
+				Configuration conf = new Configuration();
+//				conf.set("fs.defaultFS", hdfuri);
+				conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+				conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+				System.setProperty("HADOOP_USER_NAME", "hdfs");
+				System.setProperty("hadoop.home.dir", "/");
+//				FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
+				
+				//Criando diretorio no HDFS
+//				Path hdfsDir = fs.getWorkingDirectory();
+//				Path newFolderPath = new Path("");//Colocar o caminho que será do hadoop
+//				if(!fs.exists(newFolderPath)) {
+//					fs.mkdirs(newFolderPath);
+//				}
+//				Path hdfswritepath = new Path(newFolderPath + "/" + "twitter.txt");
+//				FSDataOutputStream outDataOutputStream = fs.create(hdfswritepath);
 				File file = new File("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
 				file.getParentFile().mkdir();
 				file.createNewFile();
@@ -157,6 +179,9 @@ public class TwitterConsumer {
 						//Escreve dados no arquivo pré existente fazendo o append dos mesmos	
 						 buffWriter.write(record.value() + System.lineSeparator());
 						 buffWriter.flush();
+						 //Escreve o conteudo no arquivo gerado no HDFS
+//						 outDataOutputStream.writeBytes(record.key()+ record.value());
+//						 outDataOutputStream.flush();
 					}
 //					buffWriter.close();
 				}
@@ -176,7 +201,6 @@ public class TwitterConsumer {
 		public void shutdown() {
 			// interromper o consumer.poll(); que é a pesquisa por mensagens
 			consumer.wakeup();
-
 		}
 	}
 

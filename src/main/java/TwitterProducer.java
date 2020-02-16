@@ -1,4 +1,6 @@
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -30,10 +32,15 @@ public class TwitterProducer {
 	public TwitterProducer() {}
 	//criando rastreio de loger na classe
 		Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
-		String consumerKey="dqXM1Ch9CAUwsi6J5ltJ4QPK4";
-		String consumerSecret="4eHvb7iTPInDmtQxfGBMLfiP7tjqjWNFoxbQOIuErUj1E3zQro";
-		String token="792793562064748544-DlNskS8nobKVRir5k7HIdgfJKc7yeUt";
-		String secret="J0fx96ge9hyLZQI3xaGmkKu3K3If5GxbxkVrFSlfNOZQd";
+	
+		private static Properties config = new Properties();
+		private static String arquivo = "C:\\Users\\Renato Gallis\\twitterconfig.ini";
+		
+//		String consumerKey="dqXM1Ch9CAUwsi6J5ltJ4QPK4";
+//		String consumerSecret="4eHvb7iTPInDmtQxfGBMLfiP7tjqjWNFoxbQOIuErUj1E3zQro";
+//		String token="792793562064748544-DlNskS8nobKVRir5k7HIdgfJKc7yeUt";
+//		String secret="J0fx96ge9hyLZQI3xaGmkKu3K3If5GxbxkVrFSlfNOZQd";
+//		
 		
 		List<String> terms = Lists.newArrayList("Coronavirus");
 		
@@ -94,7 +101,9 @@ public class TwitterProducer {
 
    //Criando o client para o twitter
 	public Client createTwitterClient(BlockingQueue<String> msgQueue) {
-		
+		try {
+		config.load(new FileInputStream(arquivo));
+		}catch(IOException e) {e.getStackTrace();}
 		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
 		StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 		//List<Long> followings = Lists.newArrayList(1234L, 566788L);
@@ -103,8 +112,8 @@ public class TwitterProducer {
 		hosebirdEndpoint.trackTerms(terms);
 
 		// These secrets should be read from a config file
-		Authentication hosebirdAuth = new OAuth1(consumerKey, consumerSecret, token, secret);
-		
+//		Authentication hosebirdAuth = new OAuth1(consumerKey, consumerSecret, token, secret);
+		Authentication hosebirdAuth = new OAuth1(config.getProperty("consumerKey"), config.getProperty("consumerSecret"), config.getProperty("token"), config.getProperty("secret"));
 		ClientBuilder builder = new ClientBuilder()
 				  .name("Hosebird-Client-01")      // optional: mainly for the logs
 				  .hosts(hosebirdHosts)
