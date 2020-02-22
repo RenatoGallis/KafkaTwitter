@@ -7,4 +7,5 @@ TwitterConsumer - Será o consumidor dessas mensagens fazendo um arquivo das men
 <b>Documentação das ferramentas utilizadas<b>
 <br>Kafka: https://kafka.apache.org/documentation/</br>
 <br>Api Twitter: https://developer.twitter.com/en/docs</br>
+<br>Api Twitter Get Started: https://github.com/twitter/hbc</br>
 <br>Hadoop - HDFS: https://hadoop.apache.org/docs/current/</br>
