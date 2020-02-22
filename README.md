@@ -5,6 +5,6 @@ TwitterProducer - Tem a função de fazer uma conexão com a api client do twitt
 TwitterConsumer - Será o consumidor dessas mensagens fazendo um arquivo das menssagens consumidas e posteriormente realizando a ingestão do mesmo no hadoop.
 
 <H6><b>Documentação das ferramentas utilizadas</b></h6>
-Kafka: https://kafka.apache.org/documentation/
-Api Twitter: https://developer.twitter.com/en/docs
-Hadoop - HDFS: https://hadoop.apache.org/docs/current/
+<br>Kafka: https://kafka.apache.org/documentation/</br>
+<br>Api Twitter: https://developer.twitter.com/en/docs</br>
+<br>Hadoop - HDFS: https://hadoop.apache.org/docs/current/</br>
