@@ -1,14 +1,16 @@
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.commons.httpclient.URI;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -24,7 +26,10 @@ import org.slf4j.LoggerFactory;
 
 public class TwitterConsumer {
 
-	public static void main(String[] args) {
+	private static Properties config = new Properties();
+	private static String arquivo;
+	
+	public static void main(String[] args) {	
 		new TwitterConsumer().run();// Acesso o mmetodo da classe pelo construtor que instanciei
 	}
 
@@ -33,13 +38,19 @@ public class TwitterConsumer {
 	}
 
 	private void run() {
+		
+		try {
+			arquivo = "caminho do arquivo .ini";
+			config.load(new FileInputStream(arquivo));
+			}catch(IOException e) {e.getStackTrace();}
 
 		Logger logger = LoggerFactory.getLogger(TwitterConsumer.class.getName());// logar o que desejar da classe
-		String bootstrapserver = "127.0.0.1:9092";
-		String groupID = "my-seventh-application";
-		String auto_offset_reset_config = "latest";//latest - earliest 
-		// variavel do topico:
-		String topic = "twitter_topic";
+		
+		// Passando variaveis de configuração para especificar o funcionamento do broker kafka
+		String bootstrapserver = config.getProperty("bootstrapserver");
+		String groupID = config.getProperty("groupID");
+		String auto_offset_reset_config = config.getProperty("auto_offset_reset_config");//latest - earliest 
+		String topic = config.getProperty("topic");
 		// Trava para para o consumer
 		CountDownLatch trava = new CountDownLatch(1);
 
@@ -142,53 +153,62 @@ public class TwitterConsumer {
 		public void run() {
 			// poll data temos que lançar uma exceção
 			try {
+				URI urihadoop = new URI("https://13.66.190.205:30443/gateway/default/webhdfs/v1/");
 				
 				// setando variaveis de configuração do hadoop
 				Configuration conf = new Configuration();
-//				conf.set("fs.defaultFS", hdfuri);
+			   conf.set("fs.defaultFS", "hdfs://13.66.190.205:30443");
 				conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
 				conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-				System.setProperty("HADOOP_USER_NAME", "hdfs");
+				System.setProperty("HADOOP_USER_NAME", "admin");
 				System.setProperty("hadoop.home.dir", "/");
-//				FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
+			FileSystem fs = FileSystem.get(urihadoop, conf);
 				
 				//Criando diretorio no HDFS
 //				Path hdfsDir = fs.getWorkingDirectory();
-//				Path newFolderPath = new Path("");//Colocar o caminho que será do hadoop
-//				if(!fs.exists(newFolderPath)) {
-//					fs.mkdirs(newFolderPath);
-//				}
-//				Path hdfswritepath = new Path(newFolderPath + "/" + "twitter.txt");
-//				FSDataOutputStream outDataOutputStream = fs.create(hdfswritepath);
+     			Path newFolderPath = new Path("");//Colocar o caminho que será do hadoop
+				if(!fs.exists(newFolderPath)) {
+					fs.mkdirs(newFolderPath);
+				}
+				Path hdfswritepath = new Path(newFolderPath + "/" + "twitter.txt");
+				FSDataOutputStream outDataOutputStream = fs.create(hdfswritepath);
+/*			    CRIA ARQUIVO LOCAL NA MAQUINA
 				File file = new File("C:\\Users\\Renato Gallis\\Desktop\\twitter.txt");
 				file.getParentFile().mkdir();
 				file.createNewFile();
+                //PREPARA O ARQUIVO LOCAL PARA ESCRITA
 				//passsa o caminho do arquivo que deve ser escrito
 		    	FileWriter writer = new FileWriter(file);
-		    	BufferedWriter buffWriter = new BufferedWriter(writer);
+		    	BufferedWriter buffWriter = new BufferedWriter(writer);*/
 				while (true) {
 					// Criando um consumer records para pegar a mensagem que esta sendo pesquisada
 					// de mils em  mils
 					ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(3000));
 
 					for (ConsumerRecord<String, String> record : records) {
-						// Gerar arquivo e mandar para o HDFS nesse ponto *** Renato Gallis****
-//						logger.info("Key:" + record.key() + "\n" + "Value:" + record.value() + "\n" + "Partition:"
-//								+ record.partition() + "\n" + "Offset:" + record.offset() + "TimeStamp:" + record.timestamp());
-//						
-						//Escreve dados no arquivo pré existente fazendo o append dos mesmos	
+						/*Gerar arquivo e mandar para o HDFS nesse ponto *** Renato Gallis****
+						logger.info("Key:" + record.key() + "\n" + "Value:" + record.value() + "\n" + "Partition:"
+								+ record.partition() + "\n" + "Offset:" + record.offset() + "TimeStamp:" + record.timestamp());
+                          */
+						
+						/*Escreve no arquivo gerado local e faz o append dos dados	
 						 buffWriter.write(record.value() + System.lineSeparator());
 						 buffWriter.flush();
-						 //Escreve o conteudo no arquivo gerado no HDFS
-//						 outDataOutputStream.writeBytes(record.key()+ record.value());
-//						 outDataOutputStream.flush();
+						*/
+						
+						 // HDFS - Escreve o conteudo no arquivo gerado no HDFS
+						 outDataOutputStream.writeBytes(record.key()+ record.value());
+						 outDataOutputStream.flush();
 					}
-//					buffWriter.close();
+
 				}
 			
 			} catch (WakeupException exception) {
 				logger.info("As mensagens foram recebidas!");
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				// fechar o consumidor depois de ler a mensagens

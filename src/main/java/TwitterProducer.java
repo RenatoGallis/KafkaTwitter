@@ -34,7 +34,7 @@ public class TwitterProducer {
 		Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 	
 		private static Properties config = new Properties();
-		private static String arquivo = "caminho do arquivo config.ini";
+		private static String arquivo; 
 		
 //		String consumerKey;
 //		String consumerSecret;
@@ -101,7 +101,9 @@ public class TwitterProducer {
 
    //Criando o client para o twitter
 	public Client createTwitterClient(BlockingQueue<String> msgQueue) {
+		//busca dos parametros de autenticação no arquivo de configuração
 		try {
+		arquivo = "caminho do arquivo .ini";
 		config.load(new FileInputStream(arquivo));
 		}catch(IOException e) {e.getStackTrace();}
 		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
@@ -130,9 +132,14 @@ public class TwitterProducer {
 	//Criando um kafkaProducer
 	public KafkaProducer<String, String> createKafkaProducer() {
 		// TODO Auto-generated method stub
+		//Passando o parametro de conexão com o broker atraves do arquivo de configuração
+		try {
+		arquivo = "caminho do arquivo .ini";
+		config.load(new FileInputStream(arquivo));
+		}catch(IOException e) {e.getStackTrace();}
 		
-		  String bootstrapServers = "127.0.0.1:9092";
-		
+//		  String bootstrapServers = "127.0.0.1:9092";
+		String bootstrapServers =  config.getProperty("bootstrapserver");
 		  
 		 // 1 - Fazer as propriedades do producer
 		    Properties properties = new Properties();
